@@ -29,10 +29,23 @@ From this graph it is clear that, as expected, the learner performed consistentl
 Decision trees were chosen as weak learners for boosting here. To test the performance of a weak leaner, I first tested the accuracy of a decision stump (decision tree with only 1 depth). The performance was surprisingly well `accuracy: 0.9034 ± 0.0146` and thus pruning was not used (not applicable to a decision stump).
 The only hyperparameter need tuning here is the number of weaker leaners defined by `n_estimators`. I tested `range(1, 501)` and found the accuracy increased and stabilized at around 400 **(Figure 3)**, so I used 400 as the final parameter. The accuracy was `0.9754 ± 0.0102`.
 
+![Figure 3. # of leaners vs boosting accuracy](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure3.png)
 
 
 ### 1-2-2 learning curve
-Learning curves were graphed based on the number of learners **(Figure 3)** and the size of the training set **(Figure 4)**. Again, as expected, the learner performed consistently better on the training set compared to the test set and no over-fitting was observed. The fact that the train accuracy remained very high while the test accuracy kept increasing is typical of a boosting algorithm.
+Learning curves were graphed based on the number of learners **(Figure 3)**, above and the size of the training set **(Figure 4)**. 
+
+![Figure 4. Learning curve of Adaboost with decision stumps](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure4.png)
+
+Again, as expected, the learner performed consistently better on the training set compared to the test set and no over-fitting was observed. The fact that the train accuracy remained very high while the test accuracy kept increasing is typical of a boosting algorithm.
+## 1-3 k-Nearest Neighbors
+### 1-3-1 Hyperparameter Tuning
+The only hyperparameter needed tuning here is `k`. I chose `range(1, 21)`. Consistently, the learner had a 100% accuracy score on training data when `k = 1` and the accuracy decreased as k increased **(Figure 5)**. 
+
+![Figure 5. k value vs accuracy](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure5.png)
+
+On the test set, accuracy increased initially then decreased as k got bigger. A `k = 9` was decided based on the result. It had an accuracy of `0.9315 ± 0.0279`.
+
 
 
 
