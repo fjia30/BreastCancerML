@@ -72,7 +72,32 @@ Learning curve of this linear SVM shows continued improvement in testing accurac
 
 ![Figure 9. Learning curve of a linear SVM](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure9.png)
 
-This result suggests little over-fitting by the model and implies further training might not improve the performance of this learner.
+## 1-5 Neural Networks
+### 1-5-1 Preprocessing
+Multi-layer Perceptron is also sensitive to feature scaling **(6)**. Features were standardized the same way as for SVM learning.
+### 1-5-2 Hyperparameter Tuning
+The hyperparameters include the activation function, which can be a logistic function, a rectified linear unit function `f(x) = max (0, x)` or none; the size of the hidden layer and I chose to have only one hidden layer and set the options to `[3, 10, 30, 100]`; `alpha`, which controls the regularization term. A higher `alpha` reduces the risk of over-fitting and I set the options to `[0.1, 0.01, 0.001, 0.0001, 0.00001]`.
+Grid search returned an optimized learner with a logistic activation function, `alpha = 0.1` and 30 perceptrons in the hidden layer. The accuracy score was `0.9824 ± 0.0078`.	
+### 1-5-3 learning curve
+Learning curve of the optimized ANN is slightly concerning because towards the end the testing score shows a slight drop while the training score continues to rise which is a signature of over-fitting **(Figure 10)**.
+
+![Figure 10. Learning curve of the optimized ANN](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure10.png)
+
+Given the fact that the change is very small, and our alpha value is relatively big (0.01). I think it is still mostly well-fitted.
+## 1-6 Comparison
+Learner|Decision Tree|Boosting|kNN|SVM|ANN
+----|-------------|--------|---|---|----
+Accuracy|0.9472|0.9754|0.9315|0.9754|0.9824
+
+The table above shows the accuracies of different learners on the testing set. The order is ANN > SVM = Boosting > Decision Tree > kNN. To take a closer look at the best learner ANN and to have a complete understanding of its prediction power, I generated a confusion matrix **(Figure 11)**.
+
+![Figure 11. Confusion matrix of trained ANN](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure11.png)
+
+Here a `M` (malignant) diagnosis is a positive prediction. For cancer diagnosis, the critical numbers here are the false discovery rate, which defines the percentage of benign tumors that are identified as malignant, and the false negative rate, which defines the percentage of actual malignant tumors that are missed by the learner. This trained ANN has a false discovery rate of `1/50 = 2%` and a false negative rate of `/54 = 7.5%`. It is clear that although the accuracy is high (~98.2%) the high false negative rate means this learner can miss many tumors that are actually malignant. Therefore, further improvement is needed.
+In the following parts, I performed addtional analysis and optimization to try to improve the performance of this ANN.
+
+
+
 
 
 
