@@ -45,6 +45,35 @@ The only hyperparameter needed tuning here is `k`. I chose `range(1, 21)`. Consi
 ![Figure 5. k value vs accuracy](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure5.png)
 
 On the test set, accuracy increased initially then decreased as k got bigger. A `k = 9` was decided based on the result. It had an accuracy of `0.9315 ± 0.0279`.
+## 1-3-2 learning curve
+The learning curve of the resulting 9-NN learner was graphed **(Figure 6)**.
+
+![Figure 6. Learning curve of a 9-NN learner ](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure6.png)
+
+Accuracy score on the training set remained high while accuracy score on the test set increased sharply initially then stabilized. The initial sharp increase in my opinion is because when the size of training set is small, a 9-NN is more likely to include distant neighbors from a different class due to the sparsity of the instances and perform poorly. As training size increases, more instances “fill in the blank” and 9-NN’s performance increases drastically. To prove this idea, I also graphed the learning curve of a 2-NN learner **(Figure 7)**.
+
+![Figure 7. Learning curve of a 2-NN learner](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure7.png)
+
+Consistent with my theory, the 2-NN learner performed much better with a smaller training set because `k = 2` is more local and less affected by a sparse training set.
+## 1-4 Support Vector Machines
+### 1-4-1 Preprocessing
+SVM is sensitive to scaling **[5]**, so features were first standardized by removing the mean and scaling to unit variance using `StandardScaler`.
+### 1-4-2 Hyperparameter Tuning
+Hyperparameters for SVM in this case are different kernels. I chose three different kernel functions: a radial basis function, a polynomial function and a sigmoid function.
+Accuracy of SVM with a radial basis function kernel: `0.9736 ± 0.0147`.
+Accuracy of SVM with a sigmoid function kernel: `0.9596 ± 0.0204`.
+For polynomial kernel, I had to tune the degree number d. And the result showed that a simple `d = 1`(linear) kernel performed the best **(Figure 8)** with an accuracy of `0.9754 ± 0.0102`. 
+
+![Figure 8. tuning d for SVM with a polynomial kernel](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure8.png)
+
+Because this linear kernel performed comparable to the rbf kernel and better than the sigmoid kernel. I decided to use a linear kernel due to its simplicity. 
+### 1-4-3 learning curve
+Learning curve of this linear SVM shows continued improvement in testing accuracy as training size increased until training size reached about 350 and stabilized after that **(Figure 9)**.
+
+![Figure 9. Learning curve of a linear SVM](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure9.png)
+
+This result suggests little over-fitting by the model and implies further training might not improve the performance of this learner.
+
 
 
 
