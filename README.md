@@ -96,9 +96,9 @@ The table above shows the accuracies of different learners on the testing set. T
 Here a `M` (malignant) diagnosis is a positive prediction. For cancer diagnosis, the critical numbers here are the false discovery rate, which defines the percentage of benign tumors that are identified as malignant, and the false negative rate, which defines the percentage of actual malignant tumors that are missed by the learner. This trained ANN has a false discovery rate of `1/50 = 2%` and a false negative rate of `/54 = 7.5%`. It is clear that although the accuracy is high (~98.2%) the high false negative rate means this learner can miss many tumors that are actually malignant. Therefore, further improvement is needed. In the following parts, I performed addtional analysis and optimization to try to improve the performance of this ANN.
 
 # Part II: tuning ANN with randomized optimization
-## Introduction
+## 2-1 Introduction
 In order to better tuning the hyperparameters of this ANN, I employed three different randomized optimization algorithms. They are Randomized hill climb, Simulated annealing and Genetic Algorithm. I originally used 30 perceptrons in the hidden layer but it turned out to be too resource intensive to optimize with the randomized optimization algorithms, so I reduced the number to 10. This change caused a slight drop of accuracy when I fit the classifier using Back Propagation (from 0.9824 to 0.9649 on the test set), but greatly reduced the time required for the other optimizations.
-## Optimization
+## 2-2 Optimization
 To find out what kind of impact can each parameter have on the performance of each algorithm, I performed a grid search with different combinations of key parameters for each algorithm and checked the performance of the resulting neural network. These parameters were later used to futher tune the optimization algorithms side by side.
 
 Max attempts|Num restarts|Train accuracy|Test accuracy|Train time(s)
@@ -140,22 +140,55 @@ Max attempts|Pop size|Mutation rate|Train accuracy|Test accuracy|Train time(s)
 50|50|0.3|0.93|0.96|4.76
 
 Increasing maximal number of attempts, population size and mutation rate all boosted genetic algorithm as well (see table above). These parameters were later used to futher tune the optimization algorithms side by side.
-## Comparison
+## 2-3 Comparison
 To compare the three algorithms and Back Propagation on their performance on neural network training, I varied key parameters of the three algorithms to achieve an accuracy of 0.9 of the resulting classifiers and plot the accuracy score on either training or test set vs the training time.
 
 ![Figure 12A. performance of each algorithm vs Back Propagation](https://github.com/fjia30/BreastCancerML/blob/master/PartII/Figure12A.png)
 
 ![Figure 12B. performance of each algorithm vs Back Propagation](https://github.com/fjia30/BreastCancerML/blob/master/PartII/Figure12B.png)
 
-Back Propagation, randomized hill climb and genetic algorithm consistently trained classifiers with an test accuracy score greater than 0.9. In contrast, simulated annealing performed poorly and were highly unpredictable with the results (Figure 12). Between Back Propagation, randomized hill climb and genetic algorithm, Back Propagation performed the best as it is tailor made for training neural nets and has potentially better implementation by the sklearn package. Genetic algorithm performed the best among the three alternative algorithms
-## Conclusion 
+Back Propagation, randomized hill climb and genetic algorithm consistently trained classifiers with an test accuracy score greater than 0.9. In contrast, simulated annealing performed poorly and were highly unpredictable with the results. Between Back Propagation, randomized hill climb and genetic algorithm, Back Propagation performed the best as it is tailor made for training neural nets and has potentially better implementation by the sklearn package. Genetic algorithm performed the best among the three alternative algorithms.
+## 2-4 Conclusion 
 In conclusion, the performance on training neural network classifier with the breast cancer dataset is in the order of Back Propagation > genetic algorithm >> randomized hill climb >> simulated annealing. It is interesting to note that simulated annealing, which performs very well in many cases, is the worst here. The poor performance of simulated annealing and randomized hill climb in this case is likely due to neural net’s large input space and many local maxima. Genetic algorithm on the other hand, is good at preserving good network structures which makes the search more efficient and therefore performed better in this case.
+# Part III: Dimensionality Reduction
+## 3-1 Introduction
+Our randomized optimization did not significantly improve the ANN learner. Next I applied different undupervised learning techniques to achieve dimensionality reduction and hopefully better performance. Firstly, the dataset was normalized by removing the mean and scaling to unit variance for each attribute. A quarter of the instances picked at random were set aside as the test set and the remaining instances were used for clustering and dimensionality reduction analyses.
+## 3-2 Clustering without dimensionality reduction
+I first removed labels from the data and carried out clustering using K-means or expectation maximization (EM). Because there were only two different labels, I set the number of centers to 2. After clustering, I added labels back and checked how well different labels were separated by the clustering algorithms. In an ideal situation, clustering would separate the instances into 2 groups each with a different label. Indicating a discernable difference in the attributes between the two classes of instances.
 
+![Figure 13](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure13.png)
 
+For our dataset, this is mostly the case **(Figure 13)**. Specifically, without clustering, about 63% samples were classified as benign and 37% malignant. After clustering, either using K-means or EM, the resulting clusters highly enriched one class or the other. For K-means, ~90% samples were classified as benign in one cluster and ~93% samples were classified as malignant in the other cluster. EM performed slightly better and it was ~96% benign in one cluster and ~92% malignant in the other. Although neither produced a pure cluster, suggesting room for further improvement. Nonetheless, both clustering algorithms produced clusters with much more homogenous labels. This is comparable to decision trees learning where splitting on a “good” attribute would produce well separated subpopulations. The difference is that the clustering algorithms consider all attributes together to make the split.
 
+To better characterize the performance of clustering on separating the classes, I plotted the homogeneity score, which ranges from 0 to 1 with 0 being complete mix-up and 1 being complete separation of labels (the ideal situation) against the number of centers used in clustering. K-means and EM showed similar results so only EM is shown **(Figure 14)**.
 
+![Figure 14. Number of centers vs homogeneity score](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure14.png)
 
+For the number of centers, I chose the range from 2 to 30 (the number of attributes in the dataset) as the eventual goal was to do dimensionality reduction, having more centers than the number of attributes would defeat this purpose. It shows that the score drops first and then raised higher compared to `k = 2`. But because the clustering already performed well with `k = 2` and further increasing the score require a dramatic increase of k, I chose to stick with 2 centers. 
 
+I would like to point out that an “ideal” or “better” clustering result is subjective. In this case, I wanted the clusters to separate instances with different labels well (which is commonly the case). However, having a clustering result that does not achieve this goal, does not mean that the resulting clusters are not meaningful. It still reveals differences between subgroups of instances, but those differences do not contribute to the classification problem and therefore should be considered noise.
+## 3-3 Principal Component Analysis (PCA)
+PCA was carried out first without dimensionality reduction to examine each component’s contribution to the variance based on their respective eigenvalues **(Figure 15)**.
+
+![Figure 15. PCA component explained variance ratio](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure15.png)
+
+It shows that ~90% of the variance can be nicely captured by 10 out of the 30 components and this number was chosen as the target for dimensionality reduction.
+## 3-4 Clustering after PCA
+After dimensionality reduction using PCA, I again carried out K-means and EM. The result for Dataset I was similar as before for K-means, a nice separation of the two classes **(Figure 16)**.
+
+![Figure 16](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure16.png)
+
+However, EM, having ~82% benign in one cluster and ~74% malignant in the other, performed considerably worse than before. It was likely because the ~10% variation I dropped corelated strongly to different labels and removing it was detrimental for the algorithms, especially EM. PCA did not improve the outcome of our clustering algorithms. I think the reason lies in the nature of PCA, which essentially combines all variations and picks top components that contribute to said variations. In reality, some variations contribute to the classification problem, other variations are simply noise. For example, one way to separate dogs from people is the number of legs they have, and in this case, variations in hair color, which can be great, is simply noise. But PCA mashes these variations together instead finding the relevant one, which leads to little improvement to the clustering results.
+## 3-5 Independent Component Analysis (ICA), analysis and comparison
+ICA linearly separates multivariable data into random variables with non-Gaussian distributions and are as independent to each other as possible. To check the effect of ICA, I first compared the kurtosis of each component before and after ICA, which is an indicator of non-Gaussianity. ICA significantly increased the kurtosis of the top components, making their distribution less Gaussian **(Figure 17)**.
+
+![Figure 17](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure17.png)
+
+It also showed that the 5 components with the least kurtosis in both datasets did not change much after ICA and should be safe to drop. To look at more details, I plotted the distribution of the 2 components with the highest kurtosis before and after ICA for Dataset 1 **(Figure 18)**. 
+
+![Figure 18](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure18.png)
+
+It is very clear to see the non-Gaussianity of the two components, manifested by their peakedness, greatly increased after ICA.
 
 
 
