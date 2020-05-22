@@ -143,7 +143,9 @@ Increasing maximal number of attempts, population size and mutation rate all boo
 ## Comparison
 To compare the three algorithms and Back Propagation on their performance on neural network training, I varied key parameters of the three algorithms to achieve an accuracy of 0.9 of the resulting classifiers and plot the accuracy score on either training or test set vs the training time.
 
-![Figure 12. performance of each algorithm vs Back Propagation](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure12.png)
+![Figure 12A. performance of each algorithm vs Back Propagation](https://github.com/fjia30/BreastCancerML/blob/master/PartII/Figure12A.png)
+
+![Figure 12B. performance of each algorithm vs Back Propagation](https://github.com/fjia30/BreastCancerML/blob/master/PartII/Figure12B.png)
 
 Back Propagation, randomized hill climb and genetic algorithm consistently trained classifiers with an test accuracy score greater than 0.9. In contrast, simulated annealing performed poorly and were highly unpredictable with the results (Figure 12). Between Back Propagation, randomized hill climb and genetic algorithm, Back Propagation performed the best as it is tailor made for training neural nets and has potentially better implementation by the sklearn package. Genetic algorithm performed the best among the three alternative algorithms
 ## Conclusion 
