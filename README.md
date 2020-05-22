@@ -1,6 +1,9 @@
 # BreastCancerML
 Analyzing the Breast Cancer Wisconsin (Diagnostic) Data Set using various methods with scikit-learn, an assay
 
+# How to test by youself
+All the code for each part can be found in the corresponding folder.
+
 # Introduction
 Breast cancer is the most common type of cancer in women worldwide and are diagnosed in 12% of all women in the United States over their lifetimes **[1]**. Early detection of breast cancer is key for improved treatment outcome and using machine learning, including deep learning to facilitate and improve breast cancer detection is an active research field **[2]**.
 
@@ -203,7 +206,47 @@ For randomized projections, I tried two different methods, Gaussian random proje
 
 ![Figure 21](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure21.png)
 
-It is comparable to the original result, with only one third of the dimensions. However, it is still worse compared to Figure 20 where we carried out PCA and ICA and randomized optimization, both in performance and in the degree of dimensionality reduction. This result shows the surprising simplicity and effectiveness of randomized projection. 
+It is comparable to the original result, with only one third of the dimensions. However, it is still worse compared to Figure 20 where we carried out PCA and ICA and randomized optimization, both in performance and in the degree of dimensionality reduction. This result shows the surprising simplicity and effectiveness of randomized projection.
+## 3-9 Clustering after Linear Discriminant Analysis (LDA)
+For the last feature selection / dimensionality reduction algorithm, I chose LDA. It is interesting because it is different from all other algorithms used previously and considers the label. Also because of this feature, I had to perform clustering both on the training set and on the test set. 
+
+![Figure 22](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure22.png)
+
+LDA performed very well. Both K-means and EM generated very homogenous clusters. And due to the nature of LDA, there was only at most (class number -1) number of components kept and because I had only 2 types of labels in both datasets, the transformed data had a dimension of only 1. This is the best dimensionality reduction among all algorithms tested and this advantage was mostly due to the utilization of the class labels.
+## 3-10 Back to ANN
+Now we come back to our orginal goal: to improve the performance of the ANN learner. I coupled all the dimensionality reduction processes described above with ANN training. The table above lists the results.
+
+Num of Dimensions|Train Time|Train Accuracy|Test Accuracy
+-----------------|----------|--------------|-------------
+Original Data|30|432ms|0.9842|0.9843
+PCA|10|443ms|0.9812|0.9860
+ICA|13|1517ms|0.9695|0.9720
+RP|10|527ms|0.9601|0.9510
+LDA|1|541ms|0.9765|0.9860
+K-means|10|652ms|0.9742|0.9650
+EM|10|578ms|0.9695|0.9650
+
+## 3-10 Conclution
+
+As shown in the table above, LDA or PCA coupled with ANN produced the best accuracy score on the test set `0.9860`.
+
+LDA had the least dimensions, only 1. This great reduction of dimensionality was due to firstly the characteristics of the attributes of the dataset, in which many attributes represented similar or correlated values (e.g. mean of the radius vs mean of the area) and secondly LDA’s ability to utilize the class label which provided additional information for a better dimensionality reduction.
+
+It is interesting to compare PCA vs ICA. While ICA was better at improving the clustering results, PCA was more successful in helping with ANN training. PCA reduced the number of dimensions more significantly than ICA and training the learner was much faster. The superior performance of PCA in ANN training, in this case, in my opinion was due to better conservation of information. As our previous analyses have shown, there is little noise in the data and therefore removing variance would likely lead to loss of information. And PCA is better at conserving variation in the data compared to ICA, which focuses more on the non-Gaussianity rather than variance.
+
+Last but not least, the two clustering algorithms also performed well as dimensionality reduction methods for ANN training. Using clustering for dimensionality reduction has been proven successful (e.g. the centroid method **[7]**). However, it requires a careful calibration of the number of centers and choosing the right distance function, which is less straightforward and intuitive compared to methods such as PCA and ICA.
+
+
+# References
+1. Breast Cancer Treatment, A Review. AG Waks and EP Winer. JAMA. 321(3), 288-300 (2019).
+2. Deep Learning to Improve Breast Cancer Detection on Screening Mammography. L Shen et al. Sci Rep 9, 12495 (2019).
+3. https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29
+4. https://www.kaggle.com/uciml/breast-cancer-wisconsin-data
+5. Importance of Feature Scaling. https://scikit-learn.org/stable/auto_examples/preprocessing/plot_scaling_importance.html
+6. https://scikit-learn.org/stable/modules/neural_networks_supervised.html#tips-on-practical-use
+7. Park, H., Jeon, M. & Rosen, J.B. Lower Dimensional Representation of Text Data Based on Centroids and Least Squares. BIT Numerical Mathematics 43, 427–448 (2003).
+
+
 
 
 
