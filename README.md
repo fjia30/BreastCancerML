@@ -179,16 +179,31 @@ After dimensionality reduction using PCA, I again carried out K-means and EM. Th
 ![Figure 16](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure16.png)
 
 However, EM, having ~82% benign in one cluster and ~74% malignant in the other, performed considerably worse than before. It was likely because the ~10% variation I dropped corelated strongly to different labels and removing it was detrimental for the algorithms, especially EM. PCA did not improve the outcome of our clustering algorithms. I think the reason lies in the nature of PCA, which essentially combines all variations and picks top components that contribute to said variations. In reality, some variations contribute to the classification problem, other variations are simply noise. For example, one way to separate dogs from people is the number of legs they have, and in this case, variations in hair color, which can be great, is simply noise. But PCA mashes these variations together instead finding the relevant one, which leads to little improvement to the clustering results.
-## 3-5 Independent Component Analysis (ICA), analysis and comparison
+## 3-5 Independent Component Analysis (ICA)
 ICA linearly separates multivariable data into random variables with non-Gaussian distributions and are as independent to each other as possible. To check the effect of ICA, I first compared the kurtosis of each component before and after ICA, which is an indicator of non-Gaussianity. ICA significantly increased the kurtosis of the top components, making their distribution less Gaussian **(Figure 17)**.
 
 ![Figure 17](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure17.png)
 
-It also showed that the 5 components with the least kurtosis in both datasets did not change much after ICA and should be safe to drop. To look at more details, I plotted the distribution of the 2 components with the highest kurtosis before and after ICA for Dataset 1 **(Figure 18)**. 
-
+It also showed that the 5 components with the least kurtosis in both datasets did not change much after ICA and should be safe to drop. To look at more details, I plotted the distribution of the 2 components with the highest kurtosis before and after ICA for Dataset 1 **(Figure 18)**. It is very clear to see the non-Gaussianity of the two components, manifested by their peakedness, greatly increased after ICA.
 ![Figure 18](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure18.png)
+## 3-6 PCA vs ICA
+To further visualize the clustering results and the effect of PCA and ICA on clustering. I plotted scatter plots. Green and orange represent different clusters. Dots and crosses represent different labels, (benign and malignant, respectively) **(Figure 19)**.
 
-It is very clear to see the non-Gaussianity of the two components, manifested by their peakedness, greatly increased after ICA.
+![Figure 19](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure19.png)
+
+For original data, 2 out of the 30 attributes were randomly selected to plot the data points. For PCA, two attributes with the highest variance (Figure 15) was used. For ICA, the number of components was reduced to 2. The results show that although the clustering performance did not change much after PCA or ICA (compare Figure 13, Figure 16 and Figure 20), PCA and ICA greatly improved data visualization, projecting high dimensional space which are hard to graph onto lower dimensions for a better data presentation.
+## 3-7 Clustering after ICA
+ICA is not inherently a dimensionality reduction algorithm. However, the relevance of each independent component revealed by ICA can be evaluated and the irrelevant ones can be dropped. This can reduce noise and improve the performance of downstream clustering and classification algorithms. Therefore, for the actual dimensionality reduction with ICA, I first carried out PCA as stated above to reduce the number of dimensions to 10, then conducted ICA. The problem of finding the most relevant independent components could be treated as an optimization problem which we practiced in Part II. In this case, my goal was to maximize the purity of resulting clusters which could be measured using a homogeneity score.
+
+![Figure 20](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure20.png)
+
+Using randomized hill climb, I was able to further reduce the number of dimensions to 9 with K-means and to 6 with EM with great separation **(Figure 20)**. The results were significantly better for both algorithms compared to Figure 5, with no ICA. In addition, and impressively, the K-means result was also slightly better than that in **Figure 13**, which had a dimension of 30 compared to 9 here. This result shows that PCA coupled with ICA for K-means successfully removed more than half of the dimensions but at the same time kept and even slightly increased the clustering performance. It was likely due to the successful removal irrelevant variables which only contributed to noise.
+## 3-8 Clustering after Randomized Projections
+For randomized projections, I tried two different methods, Gaussian random projection and sparse random projection. Sparse random projection produced better results, so I am only showing the results with sparse random projections. I chose to project the original dataset to a 10-dimentioal space, after about 10 trials, I was able to obtain very good clustering result using both algorithms **(Figure 21)**.
+
+![Figure 21](https://github.com/fjia30/BreastCancerML/blob/master/PartIII/Figure21.png)
+
+It is comparable to the original result, with only one third of the dimensions. However, it is still worse compared to Figure 20 where we carried out PCA and ICA and randomized optimization, both in performance and in the degree of dimensionality reduction. This result shows the surprising simplicity and effectiveness of randomized projection. 
 
 
 
