@@ -93,8 +93,65 @@ The table above shows the accuracies of different learners on the testing set. T
 
 ![Figure 11. Confusion matrix of trained ANN](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure11.png)
 
-Here a `M` (malignant) diagnosis is a positive prediction. For cancer diagnosis, the critical numbers here are the false discovery rate, which defines the percentage of benign tumors that are identified as malignant, and the false negative rate, which defines the percentage of actual malignant tumors that are missed by the learner. This trained ANN has a false discovery rate of `1/50 = 2%` and a false negative rate of `/54 = 7.5%`. It is clear that although the accuracy is high (~98.2%) the high false negative rate means this learner can miss many tumors that are actually malignant. Therefore, further improvement is needed.
-In the following parts, I performed addtional analysis and optimization to try to improve the performance of this ANN.
+Here a `M` (malignant) diagnosis is a positive prediction. For cancer diagnosis, the critical numbers here are the false discovery rate, which defines the percentage of benign tumors that are identified as malignant, and the false negative rate, which defines the percentage of actual malignant tumors that are missed by the learner. This trained ANN has a false discovery rate of `1/50 = 2%` and a false negative rate of `/54 = 7.5%`. It is clear that although the accuracy is high (~98.2%) the high false negative rate means this learner can miss many tumors that are actually malignant. Therefore, further improvement is needed. In the following parts, I performed addtional analysis and optimization to try to improve the performance of this ANN.
+
+# Part II: tuning ANN with randomized optimization
+## Introduction
+In order to better tuning the hyperparameters of this ANN, I employed three different randomized optimization algorithms. They are Randomized hill climb, Simulated annealing and Genetic Algorithm. I originally used 30 perceptrons in the hidden layer but it turned out to be too resource intensive to optimize with the randomized optimization algorithms, so I reduced the number to 10. This change caused a slight drop of accuracy when I fit the classifier using Back Propagation (from 0.9824 to 0.9649 on the test set), but greatly reduced the time required for the other optimizations.
+## Optimization
+To find out what kind of impact can each parameter have on the performance of each algorithm, I performed a grid search with different combinations of key parameters for each algorithm and checked the performance of the resulting neural network. These parameters were later used to futher tune the optimization algorithms side by side.
+
+Max attempts|Num restarts|Train accuracy|Test accuracy|Train time(s)
+------------|--------|--------------|-------------|----------
+10|0|0.90|0.85|9.08
+10|10|0.91|0.94|30.73
+10|20|0.93|0.94|50.60
+20|0|0.86|0.83|11.24
+20|10|0.93|0.96|122.95
+20|20|0.90|0.93|234.07
+50|0|0.93|0.88|11.19
+50|10|0.95|0.93|123.30
+50|20|0.95|0.95|234.63
+
+For randomized hill climb (see above table), increasing both maximal number of attempts and number of random restarts increases the accuracy of the resulting classifier.
+
+Max attempts|Init temp|Min temp|Train accuracy|Test accuracy|Train time(s)
+------------|--------|---------|--------------|-------------|----------
+50|1|0.01|0.84|0.80|15.31
+50|1|0.1|0.09|0.08|15.54
+50|5|0.01|0.88|0.91|15.10
+50|5|0.1|0.33|0.31|15.43
+100|1|0.01|0.45|0.51|15.20
+100|1|0.1|0.37|0.39|15.25
+100|5|0.01|0.52|0.52|15.29
+100|5|0.1|0.35|0.37|15.26
+
+In contrast, changing initial or final temperature had little impact on simulated annealing while increasing maximal number of attempts enhanced the resulting classifier’s performance (see above table).
+
+Max attempts|Pop size|Mutation rate|Train accuracy|Test accuracy|Train time(s)
+------------|--------|-------------|--------------|-------------|-------------
+10|10|0.1|0.82|0.86|0.33
+10|10|0.3|0.88|0.87|0.22
+10|50|0.1|0.90|0.92|2.20
+10|50|0.3|0.92|0.93|1.71
+50|10|0.1|0.85|0.93|0.59
+50|10|0.3|0.88|0.88|1.59
+50|50|0.1|0.90|0.92|2.99
+50|50|0.3|0.93|0.96|4.76
+
+Increasing maximal number of attempts, population size and mutation rate all boosted genetic algorithm as well (see table above). These parameters were later used to futher tune the optimization algorithms side by side.
+## Comparison
+To compare the three algorithms and Back Propagation on their performance on neural network training, I varied key parameters of the three algorithms to achieve an accuracy of 0.9 of the resulting classifiers and plot the accuracy score on either training or test set vs the training time.
+
+![Figure 12. performance of each algorithm vs Back Propagation](https://github.com/fjia30/BreastCancerML/blob/master/PartI/Figure12.png)
+
+Back Propagation, randomized hill climb and genetic algorithm consistently trained classifiers with an test accuracy score greater than 0.9. In contrast, simulated annealing performed poorly and were highly unpredictable with the results (Figure 12). Between Back Propagation, randomized hill climb and genetic algorithm, Back Propagation performed the best as it is tailor made for training neural nets and has potentially better implementation by the sklearn package. Genetic algorithm performed the best among the three alternative algorithms
+## Conclusion 
+In conclusion, the performance on training neural network classifier with the breast cancer dataset is in the order of Back Propagation > genetic algorithm >> randomized hill climb >> simulated annealing. It is interesting to note that simulated annealing, which performs very well in many cases, is the worst here. The poor performance of simulated annealing and randomized hill climb in this case is likely due to neural net’s large input space and many local maxima. Genetic algorithm on the other hand, is good at preserving good network structures which makes the search more efficient and therefore performed better in this case.
+
+
+
+
 
 
 
