@@ -214,10 +214,10 @@ For the last feature selection / dimensionality reduction algorithm, I chose LDA
 
 LDA performed very well. Both K-means and EM generated very homogenous clusters. And due to the nature of LDA, there was only at most (class number -1) number of components kept and because I had only 2 types of labels in both datasets, the transformed data had a dimension of only 1. This is the best dimensionality reduction among all algorithms tested and this advantage was mostly due to the utilization of the class labels.
 ## 3-10 Back to ANN
-Now we come back to our orginal goal: to improve the performance of the ANN learner. I coupled all the dimensionality reduction processes described above with ANN training. The table above lists the results.
+Now we come back to our orginal goal: to improve the performance of the ANN learner. I coupled all the dimensionality reduction processes described above with ANN training. The table below lists the results.
 
-Num of Dimensions|Train Time|Train Accuracy|Test Accuracy
------------------|----------|--------------|-------------
+Dimensionality Reduction Algorithms|Num of Dimensions|Train Time|Train Accuracy|Test Accuracy
+-----------------------------------|-----------------|----------|--------------|-------------
 Original Data|30|432ms|0.9842|0.9843
 PCA|10|443ms|0.9812|0.9860
 ICA|13|1517ms|0.9695|0.9720
